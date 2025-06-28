@@ -11,6 +11,7 @@ def get_prompt(chapter_number, novel_id):
     
     # look for previous chapter
     if (chapter_number > 1):
+        print('chapter number is greater than 1')
         previous_chapter = db.Chapter.get_or_none((db.Chapter.chapter_number == chapter_number - 1) & (db.Chapter.novel == novel_id))
     else:
         previous_chapter = None 
@@ -27,6 +28,8 @@ def get_prompt(chapter_number, novel_id):
         content += 'Here is the character bible for the novel: \n'
         for bible in character_bible:
             content += f"{bible.name}: {bible.description}\n"
+        content += '\n Update it as needed after translating the new chapter.\n\n'
+
 
     content += f'Here is the chapter content, translate the follwing chapter: \n{chapter.content}'
 
@@ -36,7 +39,7 @@ def get_prompt(chapter_number, novel_id):
       " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible"
       " should include the names, places, and other proper nouns in the chapter, as well as their descriptions and any other relevant information. Finially, be sure to write notes for the next"
       " chapter to help other translators."},
-      {"role": "user", "content": ""},
+      {"role": "user", "content": content},
     ]  
 
     return messages

@@ -34,6 +34,7 @@ class Chapter(BaseModel):
     is_filled = BooleanField(default=False)
     is_translated = BooleanField(default=False)
     translated_content = TextField(null=True)
+    translated_title = CharField(null=True)
     summary = TextField(null=True)
     notes_for_next_chapter = TextField(null=True)
 

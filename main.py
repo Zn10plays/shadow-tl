@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 import db.connector as db
-from models import TranslatedResults
+from vllm.models import TranslatedResults
 
 client = OpenAI(
   # This is the default and can be omitted
