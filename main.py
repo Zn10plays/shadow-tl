@@ -2,6 +2,7 @@ import os
 from openai import OpenAI
 import db.connector as db
 from vllm.models import TranslatedResults
+from utils.prompts import get_prompt
 
 client = OpenAI(
   # This is the default and can be omitted
@@ -14,7 +15,7 @@ def main():
     completion = client.beta.chat.completions.parse(
         model="google/gemma-3-27b-it",
         max_tokens=5000,
-        messages=get_prompt(1),
+        messages=get_prompt(2, 1),
         temperature=0.2,
         response_format=TranslatedResults,
     )
