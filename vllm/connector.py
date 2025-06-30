@@ -3,6 +3,8 @@ import os
 from shadow_db import Novel, Chapter  # Adjusted import to match the new structure
 from vllm.models import TranslatedResults
 from utils.prompts import get_prompt
+import dotenv
+dotenv.load_dotenv()
 
 client = None
 
