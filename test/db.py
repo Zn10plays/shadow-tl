@@ -1,4 +1,4 @@
-import db.connector as db
+import shadow_db as db
 
 bible = db.BibleInfo.select().where(db.BibleInfo.novel == 1)
 

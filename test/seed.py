@@ -1,4 +1,4 @@
-from db.connector import Novel, Chapter, BibleInfo
+from shadow_db import Chapter, BibleInfo
 
 data = {}
 

@@ -1,4 +1,3 @@
-import db.connector as db
 import utils.prompts as prompts
 
 print("Testing prompt generation...")
