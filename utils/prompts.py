@@ -1,4 +1,4 @@
-import db.connector as db
+import shadow_db as db
 
 def get_prompt(chapter_number, novel_id):
     # Fetch the chapter content from the database
