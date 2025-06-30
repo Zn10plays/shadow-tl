@@ -37,8 +37,8 @@ def get_prompt(chapter_number, novel_id):
       {"role": "system", "content": "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English."
       " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, and flow of the chapter."
       " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible"
-      " should include the names, places, and other proper nouns in the chapter, as well as their descriptions and any other relevant information. Finially, be sure to write notes for the next"
-      " chapter to help other translators."},
+      " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their descriptions and any other relevant information. "
+      "Finially, be sure to write notes for the next chapter to help other translators."},
       {"role": "user", "content": content},
     ]  
 
