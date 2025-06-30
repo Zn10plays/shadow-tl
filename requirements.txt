@@ -1,2 +1,5 @@
 peewee
 openai
+python-dotenv
+pymysql
+cryptography
