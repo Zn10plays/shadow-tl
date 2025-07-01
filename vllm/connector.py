@@ -69,23 +69,16 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
             print()  # Ensure a newline after the stream
 
             # json parse the content
-            content = content.strip()
             if content.startswith('{') and content.endswith('}'):
-                content = TranslatedResults.model_validate_json(content)
+                print (f"Translated content for chapter {chapter.chapter_number} of novel {chapter.novel_id}: {content}")
+                return TranslatedResults.model_validate_json(content)
             else:
                 raise ValueError("Streamed content is not a valid JSON object.")
 
-            return TranslatedResults(
-                title=chapter.title,
-                summary=chapter.summary,
-                content=content,
-                character_bible=[],
-                notes_for_next_chapter=""
-            )
-
-        return completion.choices[0].message.content
+        return TranslatedResults.model_validate_json(completion.choices[0].message.content)
     
     except Exception as e:
+
         print(f"Error translating chapter {chapter.chapter_number} of novel {chapter.novel_id}: {e}")
         return TranslatedResults(
             title="!!Error!!",
