@@ -35,10 +35,27 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False, model=Models['GEMMA3']) -> TranslatedResults:
+def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Models['GEMMA3']) -> TranslatedResults:
     """
     Translate a chapter using the OpenAI client.
     """
+
+    if not isinstance(chapter, Chapter):
+        raise TypeError("Expected 'chapter' to be an instance of Chapter class.")
+    
+    if chapter.translated_content and not force:
+        """
+        If the chapter is already translated and force is not set, return the existing translation.
+        """
+        print(f"Chapter {chapter.chapter_number} of novel {chapter.novel} is already translated.")
+        return TranslatedResults(
+            translated_title=chapter.translated_title,
+            summary=chapter.summary,
+            character_bible=[],
+            notes_for_next_chapter=chapter.notes_for_next_chapter,
+            translated_content=chapter.translated_content
+        )
+
     openai_client = get_openai_client()
 
     prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel, model=model)
