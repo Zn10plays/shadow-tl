@@ -6,7 +6,7 @@ from typing import List
 # Function to retrieve relevant terms from the BibleInfo based on chapter content
 # pulls them from the novel bible
 ###
-def get_relevent_terms(chapterid: int) -> list[BibleInfo]:
+def get_relevent_terms(chapterid: int, verbose: bool = False) -> list[BibleInfo]:
     chapter = Chapter.get_or_none(Chapter.id == chapterid)
 
     if not chapter:
@@ -34,6 +34,11 @@ def get_relevent_terms(chapterid: int) -> list[BibleInfo]:
                 break
     # there will not be any duplicates in the matched_notes list
     # no need to check for duplicates
+
+    if verbose:
+        print(f"Matched {len(matched_notes)} terms out of {len(bibles)} total terms.")
+        for note in matched_notes:
+            print(f"Matched: {note.name} ({note.classification}) - {note.description}")
 
     return matched_notes
 
