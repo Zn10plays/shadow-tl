@@ -35,7 +35,7 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, logger, log_stream=False) -> TranslatedResults:
+def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
     """
     Translate a chapter using the OpenAI client.
     """
