@@ -4,41 +4,6 @@ from vllm.models import TranslatedResults
 from utils.prompts import get_bible_summary_prompt
 from utils.genai import manager
 
-###
-# Function to retrieve relevant terms from the BibleInfo based on chapter content
-# pulls them from the novel bible
-###
-def get_relevent_terms(chapterid: int) -> list[BibleInfo]:
-    chapter = Chapter.get_or_none(Chapter.id == chapterid)
-
-    if not chapter:
-        raise ValueError(f"Chapter with id {chapterid} not found.")
-    
-    bibles = BibleInfo.select().where(BibleInfo.novel == chapter.novel)
-
-    unmatched_notes = []
-    matched_notes = []
-
-    # first round pass to see if there is an excat match
-    for bible in bibles:
-        if bible.raw_name in chapter.content:
-            matched_notes.append(bible)
-        else:
-            unmatched_notes.append(bible)
-
-    # second round pass to see if there is a partial match
-    # maybe the name is saved as firstname lastname, but in the chapter it is only referred to as lastname
-    for unmatched in unmatched_notes:
-        unmatched_name_parts = unmatched.raw_name.split(' ')
-        for part in unmatched_name_parts:
-            if part in chapter.content:
-                matched_notes.append(unmatched)
-                break
-    # there will not be any duplicates in the matched_notes list
-    # no need to check for duplicates
-
-    return matched_notes
-
 def summarize_bible_changes(old_bible: BibleInfo, new_bible: BibleInfo) -> tuple[str, bool]:
     try:
         prompt = get_bible_summary_prompt(old_bible, new_bible)
@@ -73,7 +38,7 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
 
     if not existing_info:
         # If it doesn't exist, create a new entry
-        info.novel = novel
+        info.novel = novel.index()
         info.save()
         return
 

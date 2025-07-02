@@ -1,5 +1,42 @@
 import shadow_db as db
-from utils.context import get_relevent_terms
+from shadow_db import Novel, Chapter, BibleInfo
+from typing import List
+
+###
+# Function to retrieve relevant terms from the BibleInfo based on chapter content
+# pulls them from the novel bible
+###
+def get_relevent_terms(chapterid: int) -> list[BibleInfo]:
+    chapter = Chapter.get_or_none(Chapter.id == chapterid)
+
+    if not chapter:
+        raise ValueError(f"Chapter with id {chapterid} not found.")
+    
+    bibles = BibleInfo.select().where(BibleInfo.novel == chapter.novel)
+
+    unmatched_notes = []
+    matched_notes = []
+
+    # first round pass to see if there is an excat match
+    for bible in bibles:
+        if bible.raw_name in chapter.content:
+            matched_notes.append(bible)
+        else:
+            unmatched_notes.append(bible)
+
+    # second round pass to see if there is a partial match
+    # maybe the name is saved as firstname lastname, but in the chapter it is only referred to as lastname
+    for unmatched in unmatched_notes:
+        unmatched_name_parts = unmatched.raw_name.split(' ')
+        for part in unmatched_name_parts:
+            if part in chapter.content:
+                matched_notes.append(unmatched)
+                break
+    # there will not be any duplicates in the matched_notes list
+    # no need to check for duplicates
+
+    return matched_notes
+
 
 Models = {
     'GEMMA3': 1,
