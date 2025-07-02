@@ -41,11 +41,13 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
     """
     openai_client = get_openai_client()
 
+    prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel)
+
     try:
         completion = openai_client.chat.completions.create(
             model=openai_client.default_model,
-            max_tokens=5000,
-            messages=get_chapter_translation_prompt(chapter.novel_id, chapter.chapter_number),
+            max_tokens=10_000,
+            messages=prompt,
             temperature=0.2,
             response_format={
                 'type': 'json_schema',
