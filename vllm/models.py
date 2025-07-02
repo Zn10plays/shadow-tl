@@ -5,7 +5,7 @@ class Info(BaseModel):
     """
     Model to represent character or place information.
     """
-    translated_translated: str
+    translated_name: str
     orignal_name: str
     classification: str
     description: str
@@ -19,5 +19,5 @@ class TranslatedResults(BaseModel):
     summary: str
     character_bible: List[Info]
     notes_for_next_chapter: str
-    content: str
+    translation_content: str
 
