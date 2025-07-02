@@ -2,7 +2,7 @@ import openai
 import os
 from shadow_db import Novel, Chapter  # Adjusted import to match the new structure
 from vllm.models import TranslatedResults
-from utils.prompts import get_prompt
+from utils.prompts import get_chapter_translation_prompt
 import dotenv
 dotenv.load_dotenv()
 
@@ -45,7 +45,7 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
         completion = openai_client.chat.completions.create(
             model=openai_client.default_model,
             max_tokens=5000,
-            messages=get_prompt(chapter.novel_id, chapter.chapter_number),
+            messages=get_chapter_translation_prompt(chapter.novel_id, chapter.chapter_number),
             temperature=0.2,
             response_format={
                 'type': 'json_schema',
