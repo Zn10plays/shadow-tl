@@ -67,7 +67,7 @@ def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_
 
     chapter.translated_title = results.translated_title
     chapter.summary = results.summary
-    chapter.content = results.translation
+    chapter.content = results.translation_content
     chapter.notes_for_next_chapter = results.notes_for_next_chapter
     chapter.is_translated = True
 
