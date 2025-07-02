@@ -1,6 +1,17 @@
 import shadow_db as db
 
-def get_prompt(chapter_number, novel_id):
+Models = {
+    'GEMMA3': 1,
+    'MISTRAL': 2,
+}
+
+system_prompt = "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English." \
+    " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, and flow of the chapter." \
+    " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible" \
+    " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their descriptions and any other relevant information. " \
+    " Finially, be sure to write notes for the next chapter to help other translators."
+
+def get_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
     # Fetch the chapter content from the database
     try:
         chapter = db.Chapter.get((db.Chapter.chapter_number == chapter_number) & (db.Chapter.novel == novel_id))
@@ -33,13 +44,20 @@ def get_prompt(chapter_number, novel_id):
 
     content += f'Here is the chapter content, translate the follwing chapter: \n{chapter.content}'
 
-    messages = [
-      {"role": "system", "content": "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English."
-      " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, and flow of the chapter."
-      " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible"
-      " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their descriptions and any other relevant information. "
-      "Finially, be sure to write notes for the next chapter to help other translators."},
-      {"role": "user", "content": content},
-    ]  
+    if model == Models['GEMMA3']:
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": content},
+        ] 
+    elif model == Models['MISTRAL']:
+        messages = [
+            {'role': 'system', 'content': system_prompt},
+            {'role': 'user', 'content': [
+                {
+                    'type': 'text',
+                    'text': content
+                }
+            ]},
+        ]
 
     return messages
