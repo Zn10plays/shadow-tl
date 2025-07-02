@@ -86,5 +86,5 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
             summary='ERROR!!- Unable to summarize chapter',
             character_bible=[],
             notes_for_next_chapter='ERROR!!- Unable to provide notes for next chapter',
-            translation_content='ERROR!!- Unable to translate chapter content'
+            translated_content='ERROR!!- Unable to translate chapter content'
         )

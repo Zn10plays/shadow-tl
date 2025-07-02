@@ -19,5 +19,5 @@ class TranslatedResults(BaseModel):
     summary: str
     character_bible: List[Info]
     notes_for_next_chapter: str
-    translation_content: str
+    translated_content: str
 
