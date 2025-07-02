@@ -15,7 +15,7 @@ class TranslatedResults(BaseModel):
     """
     Model to represent the translated results.
     """
-    title: str
+    translated_title: str
     summary: str
     character_bible: List[Info]
     notes_for_next_chapter: str
