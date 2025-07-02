@@ -8,10 +8,10 @@ Models = {
 system_prompt = "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English." \
     " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, and flow of the chapter." \
     " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible" \
-    " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their descriptions and any other relevant information. " \
-    " Finially, be sure to write notes for the next chapter to help other translators."
+    " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their classification (person, place, item, skill) descriptions" \
+    " and any other relevant information. Finially, be sure to write notes for the next chapter to help other translators."
 
-def get_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
+def get_chapter_translation_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
     # Fetch the chapter content from the database
     try:
         chapter = db.Chapter.get((db.Chapter.chapter_number == chapter_number) & (db.Chapter.novel == novel_id))
@@ -38,7 +38,7 @@ def get_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
     if character_bible.exists():
         content += 'Here is the character bible for the novel: \n'
         for bible in character_bible:
-            content += f"{bible.name}: {bible.description}\n"
+            content += f"{bible.name} ({bible.classification}): {bible.description}\n"
         content += '\n Update it as needed after translating the new chapter.\n\n'
 
 
@@ -61,3 +61,17 @@ def get_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
         ]
 
     return messages
+
+def get_bible_summary_prompt(oldBible: db.BibleInfo, newBible: db.BibleInfo):
+    """
+    Generate a prompt to summarize the changes in the BibleInfo.
+    """
+    return f"""
+    Update the following {oldBible.classification} description based on the new context provided. The updated description should be concise and integrate new relevant information while preserving key existing details.
+    {oldBible.classification} name: {oldBible.name}
+    Current description: "{oldBible.description}"
+
+    new context: "{newBible.description}"
+
+    answer in quotations for example: "here is the description"
+    """
