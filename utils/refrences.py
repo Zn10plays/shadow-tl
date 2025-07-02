@@ -78,7 +78,7 @@ def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_
         add_or_update_bible_info(
             Novel.get(chapter.novel_id),
             BibleInfo(
-                name=bible_info.translated_translated,
+                name=bible_info.translated_name,
                 raw_name=bible_info.orignal_name,
                 classification=bible_info.classification,
                 description=bible_info.description,
