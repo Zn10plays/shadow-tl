@@ -36,22 +36,15 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
         (BibleInfo.raw_name == info.raw_name)
     )
 
-    if not existing_info:
+    # if new or classification is different, we need to update it
+    if not existing_info or existing_info.classification != info.classification:
         # If it doesn't exist, create a new entry
         info.novel = novel.get_id()
         info.save()
         return
 
-    summary, success = summarize_bible_changes(existing_info, info)
-
-    if not success:
-        print("Failed to summarize the changes, skipping update.")
-        print('traceback, old:', existing_info.name,)
-        print('description:', existing_info.description, 
-              'new:', info.name, 'description:', info.description)
-        return
-    
-    existing_info.description = summary
+    # if it exists, we need to update it
+    existing_info.description = info.description
     # save it
     existing_info.save()
     return
