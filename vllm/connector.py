@@ -1,6 +1,6 @@
 import openai
 import os
-from shadow_db import Novel, Chapter  # Adjusted import to match the new structure
+from shadow_db import Chapter  # Adjusted import to match the new structure
 from vllm.models import TranslatedResults
 from utils.prompts import get_chapter_translation_prompt
 import dotenv
@@ -71,7 +71,7 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
 
             # json parse the content
             if content.startswith('{') and content.endswith('}'):
-                print (f"Translated content for chapter {chapter.chapter_number} of novel {chapter.novel_id}: {content}")
+                print (f"Translated content for chapter {chapter.chapter_number} of novel {chapter.novel}: {content}")
                 return TranslatedResults.model_validate_json(content)
             else:
                 raise ValueError("Streamed content is not a valid JSON object.")
@@ -82,9 +82,9 @@ def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
 
         print(f"Error translating chapter {chapter.chapter_number} of novel {chapter.novel_id}: {e}")
         return TranslatedResults(
-            title="!!Error!!",
-            summary="An error occurred during translation.",
-            content="",
+            translated_title='ERROR!!- Unable to translate chapter',
+            summary='ERROR!!- Unable to summarize chapter',
             character_bible=[],
-            notes_for_next_chapter=""
+            notes_for_next_chapter='ERROR!!- Unable to provide notes for next chapter',
+            translation_content='ERROR!!- Unable to translate chapter content'
         )
