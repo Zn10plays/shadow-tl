@@ -2,7 +2,7 @@ import openai
 import os
 from shadow_db import Chapter  # Adjusted import to match the new structure
 from vllm.models import TranslatedResults
-from utils.prompts import get_chapter_translation_prompt
+from utils.prompts import get_chapter_translation_prompt, Models
 import dotenv
 dotenv.load_dotenv()
 
@@ -35,13 +35,13 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False) -> TranslatedResults:
+def translate_chapter(chapter: Chapter, log_stream=False, model=Models['GEMMA3']) -> TranslatedResults:
     """
     Translate a chapter using the OpenAI client.
     """
     openai_client = get_openai_client()
 
-    prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel)
+    prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel, model=model)
 
     try:
         completion = openai_client.chat.completions.create(
