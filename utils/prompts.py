@@ -1,4 +1,5 @@
 import shadow_db as db
+from utils.context import get_relevent_terms
 
 Models = {
     'GEMMA3': 1,
@@ -28,14 +29,14 @@ def get_chapter_translation_prompt(chapter_number, novel_id, model=Models['GEMMA
         previous_chapter = None 
 
     # get character bible for the novel
-    character_bible = db.BibleInfo.select().where(db.BibleInfo.novel == novel_id)
+    character_bible = get_relevent_terms(novel_id)
 
     content = f'Translate the following chapter to English, the title is {chapter.title} and it is number {chapter.chapter_number}. \n\n'
 
     if previous_chapter and previous_chapter.is_translated:
         content += f' Here is some background info. Summary for the previous chapter: {previous_chapter.summary}. \n\n'
 
-    if character_bible.exists():
+    if len(character_bible) > 0:
         content += 'Here is the character bible for the novel: \n'
         for bible in character_bible:
             content += f"{bible.name} ({bible.classification}): {bible.description}\n"
