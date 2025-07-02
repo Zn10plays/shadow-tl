@@ -11,7 +11,7 @@ def main():
         log_stream=True
     )
 
-    save_translated_chapter(chapter, results, vorbose=True)
+    save_translated_chapter(chapter, results, verbose=True)
     
 
 if __name__ == "__main__":

@@ -56,8 +56,8 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
     existing_info.save()
     return
 
-def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_update=False, vorbose=False):
-    if vorbose:
+def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_update=False, verbose=False):
+    if verbose:
         print(f"Saving translated chapter {chapter.chapter_number} of novel {chapter.novel_id}.")
 
 
@@ -73,7 +73,7 @@ def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_
 
     # update the character bible
     for bible_info in results.character_bible:
-        if vorbose:
+        if verbose:
             print(f"Adding or updating BibleInfo for {bible_info.translated_name} in novel {chapter.novel_id}.")
         add_or_update_bible_info(
             Novel.get(chapter.novel_id),
@@ -89,5 +89,5 @@ def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_
     # save the chapter
     chapter.save()
 
-    if vorbose:
+    if verbose:
         print(f"Translated chapter {chapter.chapter_number} of novel {chapter.novel_id} saved successfully.")
