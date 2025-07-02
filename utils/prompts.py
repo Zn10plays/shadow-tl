@@ -66,7 +66,7 @@ def get_chapter_translation_prompt(chapter_number, novel_id, model=Models['GEMMA
         previous_chapter = None 
 
     # get character bible for the novel
-    character_bible = get_relevent_terms(novel_id)
+    character_bible = get_relevent_terms(chapter.id)
 
     content = f'Translate the following chapter to English, the title is {chapter.title} and it is number {chapter.chapter_number}. \n\n'
 
