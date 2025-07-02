@@ -38,7 +38,7 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
 
     if not existing_info:
         # If it doesn't exist, create a new entry
-        info.novel = novel.index()
+        info.novel = novel.get_id()
         info.save()
         return
 
@@ -67,7 +67,7 @@ def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_
 
     chapter.translated_title = results.translated_title
     chapter.summary = results.summary
-    chapter.content = results.translation_content
+    chapter.translated_content = results.translation_content
     chapter.notes_for_next_chapter = results.notes_for_next_chapter
     chapter.is_translated = True
 
