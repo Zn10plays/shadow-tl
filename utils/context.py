@@ -1,5 +1,6 @@
 from shadow_db import Novel, Chapter, BibleInfo
 import re
+from vllm.models import TranslatedResults
 from utils.prompts import get_bible_summary_prompt
 from utils.genai import manager
 
@@ -89,3 +90,39 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
     # save it
     existing_info.save()
     return
+
+def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_update=False, vorbose=False):
+    if vorbose:
+        print(f"Saving translated chapter {chapter.chapter_number} of novel {chapter.novel_id}.")
+
+
+    if (chapter.is_translated and not force_update):
+        print(f"Chapter {chapter.chapter_number} of novel {chapter.novel_id} is already translated. Use force_update=True to overwrite.")
+        return    
+
+    chapter.translated_title = results.translated_title
+    chapter.summary = results.summary
+    chapter.content = results.translation
+    chapter.notes_for_next_chapter = results.notes_for_next_chapter
+    chapter.is_translated = True
+
+    # update the character bible
+    for bible_info in results.character_bible:
+        if vorbose:
+            print(f"Adding or updating BibleInfo for {bible_info.translated_name} in novel {chapter.novel_id}.")
+        add_or_update_bible_info(
+            Novel.get(chapter.novel_id),
+            BibleInfo(
+                name=bible_info.translated_translated,
+                raw_name=bible_info.orignal_name,
+                classification=bible_info.classification,
+                description=bible_info.description,
+                novel=chapter.novel
+            )
+        )
+
+    # save the chapter
+    chapter.save()
+
+    if vorbose:
+        print(f"Translated chapter {chapter.chapter_number} of novel {chapter.novel_id} saved successfully.")
