@@ -5,9 +5,11 @@ class Info(BaseModel):
     """
     Model to represent character or place information.
     """
-    name_translated: str
+    translated_translated: str
     orignal_name: str
+    classification: str
     description: str
+
 
 class TranslatedResults(BaseModel):
     """
