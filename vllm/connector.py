@@ -2,7 +2,7 @@ import openai
 import os
 from shadow_db import Chapter  # Adjusted import to match the new structure
 from vllm.models import TranslatedResults
-from utils.prompts import get_chapter_translation_prompt, Models
+from utils.prompts import get_chapter_translation_prompt
 import dotenv
 dotenv.load_dotenv()
 
