@@ -42,12 +42,6 @@ def get_relevent_terms(chapterid: int, verbose: bool = False) -> list[BibleInfo]
 
     return matched_notes
 
-
-Models = {
-    'GEMMA3': 1,
-    'MISTRAL': 2,
-}
-
 system_prompt = "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English." \
     " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, and flow of the chapter." \
     " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible" \
@@ -87,21 +81,10 @@ def get_chapter_translation_prompt(chapter_number, novel_id, model=Models['GEMMA
 
     content += f'Here is the chapter content, translate the follwing chapter: \n{chapter.content}'
 
-    if model == Models['GEMMA3']:
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": content},
-        ] 
-    elif model == Models['MISTRAL']:
-        messages = [
-            {'role': 'system', 'content': system_prompt},
-            {'role': 'user', 'content': [
-                {
-                    'type': 'text',
-                    'text': content
-                }
-            ]},
-        ]
+    messages = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": content},
+    ] 
 
     return messages
 

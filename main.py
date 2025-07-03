@@ -6,12 +6,16 @@ from utils.refrences import save_translated_chapter
 def main():
     chapter = Chapter.get(novel_id=1, chapter_number=1)
 
-    results = translate_chapter(
+    results, success = translate_chapter(
         chapter,
         log_stream=True
     )
 
-    save_translated_chapter(chapter, results, verbose=True)
+    if not success:
+        print(f"Failed to translate chapter {chapter.chapter_number} of novel {chapter.novel}.")
+        return
+
+    save_translated_chapter(chapter, results)
     
 
 if __name__ == "__main__":

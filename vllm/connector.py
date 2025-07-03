@@ -17,12 +17,9 @@ def get_openai_client():
     """
     Initialize and return an OpenAI client with the specified base URL and API key.
     """
-    base_url = os.getenv("VLLM_BACKEND_URL", "http://localhost:8000")
+    base_url = os.getenv("VLLM_BACKEND_URL", "http://localhost:8000/v1")
     api_key = os.getenv("VLLM_KEY", "your_api_key_here")  # Replace with your actual API key
     base_model = os.getenv("VLLM_DEFAULT_MODEL", "google/gemma-3-1b-it")
-
-    if not base_url.endswith("/v1"):
-        base_url = f"{base_url}/v1"
 
     client = openai.OpenAI(
         base_url=base_url,
@@ -35,7 +32,7 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Models['GEMMA3']) -> tuple[TranslatedResults, bool]:
+def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperature=None, thinking_budget=0) -> tuple[TranslatedResults, bool]:
     """
     Translate a chapter using the OpenAI client.
     returns translation results, and a boolean indicating success.
@@ -59,19 +56,29 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Mod
 
     openai_client = get_openai_client()
 
-    prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel, model=model)
+    prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel)
 
     try:
         completion = openai_client.chat.completions.create(
             model=openai_client.default_model,
             max_tokens=10_000,
             messages=prompt,
-            temperature=0.2,
+            temperature=temperature,
             response_format={
                 'type': 'json_schema',
                 "json_schema": {
                     'name': 'TranslatedResults',
                     "schema": TranslatedResults.model_json_schema(),
+                }
+            },
+            extra_body={
+                'extra_body': {
+                    "google": {
+                    "thinking_config": {
+                        "thinking_budget": thinking_budget,
+                        "include_thoughts": True
+                    }
+                    }
                 }
             },
             stream=log_stream
