@@ -32,7 +32,7 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperature=None, thinking_budget=0) -> tuple[TranslatedResults, bool]:
+def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperature=None, thinking_budget=0, include_thoughts=False) -> tuple[TranslatedResults, bool]:
     """
     Translate a chapter using the OpenAI client.
     returns translation results, and a boolean indicating success.
@@ -74,10 +74,10 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperatu
             extra_body={
                 'extra_body': {
                     "google": {
-                    "thinking_config": {
-                        "thinking_budget": thinking_budget,
-                        "include_thoughts": True
-                    }
+                        "thinking_config": {
+                            "thinking_budget": thinking_budget,
+                            "include_thoughts": include_thoughts
+                        }
                     }
                 }
             },

@@ -8,14 +8,18 @@ def main():
 
     results, success = translate_chapter(
         chapter,
-        log_stream=True
+        log_stream=True,
+        thinking_budget=800,
+        temperature=0.2,  # Adjust temperature as needed
+        force=True,
+        include_thoughts=False
     )
 
     if not success:
         print(f"Failed to translate chapter {chapter.chapter_number} of novel {chapter.novel}.")
         return
 
-    save_translated_chapter(chapter, results)
+    save_translated_chapter(chapter, results, force=True)
     
 
 if __name__ == "__main__":
