@@ -41,7 +41,7 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperatu
     if not isinstance(chapter, Chapter):
         raise TypeError("Expected 'chapter' to be an instance of Chapter class.")
     
-    if chapter.translated_content and not force:
+    if chapter.is_translated and not force:
         """
         If the chapter is already translated and force is not set, return the existing translation.
         """
