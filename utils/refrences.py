@@ -49,14 +49,13 @@ def add_or_update_bible_info(novel: Novel, info: BibleInfo):
     existing_info.save()
     return
 
-def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force_update=False, verbose=False):
+def save_translated_chapter(chapter: Chapter, results: TranslatedResults, force=False, verbose=False):
     if verbose:
         print(f"Saving translated chapter {chapter.chapter_number} of novel {chapter.novel_id}.")
 
-
-    if (chapter.is_translated and not force_update):
-        print(f"Chapter {chapter.chapter_number} of novel {chapter.novel_id} is already translated. Use force_update=True to overwrite.")
-        return    
+    if (chapter.is_translated and not force):
+        print(f"Chapter {chapter.chapter_number} of novel {chapter.novel} is already translated. Use force=True to overwrite.")
+        return
 
     chapter.translated_title = results.translated_title
     chapter.summary = results.summary
