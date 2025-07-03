@@ -2,13 +2,13 @@ from shadow_db import Novel, Chapter, BibleInfo
 import re
 from vllm.models import TranslatedResults
 from utils.prompts import get_bible_summary_prompt
-from utils.genai import manager
 
 def summarize_bible_changes(old_bible: BibleInfo, new_bible: BibleInfo) -> tuple[str, bool]:
     try:
         prompt = get_bible_summary_prompt(old_bible, new_bible)
 
-        response = manager.generate(prompt)
+        # response = manager.generate(prompt)
+        response = '"funny hahahah"'
 
         # the res is in ""
         if response.startswith('"') and response.endswith('"'):
