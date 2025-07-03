@@ -35,9 +35,10 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Models['GEMMA3']) -> TranslatedResults:
+def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Models['GEMMA3']) -> tuple[TranslatedResults, bool]:
     """
     Translate a chapter using the OpenAI client.
+    returns translation results, and a boolean indicating success.
     """
 
     if not isinstance(chapter, Chapter):
@@ -54,7 +55,7 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Mod
             character_bible=[],
             notes_for_next_chapter=chapter.notes_for_next_chapter,
             translated_content=chapter.translated_content
-        )
+        ), True
 
     openai_client = get_openai_client()
 
@@ -93,7 +94,7 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Mod
             else:
                 raise ValueError("Streamed content is not a valid JSON object.")
 
-        return TranslatedResults.model_validate_json(completion.choices[0].message.content)
+        return TranslatedResults.model_validate_json(completion.choices[0].message.content), True
     
     except Exception as e:
 
@@ -104,4 +105,4 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, model=Mod
             character_bible=[],
             notes_for_next_chapter='ERROR!!- Unable to provide notes for next chapter',
             translated_content='ERROR!!- Unable to translate chapter content'
-        )
+        ), False
