@@ -48,7 +48,7 @@ system_prompt = "You are an translation agent at a webnovel publishing company. 
     " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their classification (person, place, item, skill) descriptions" \
     " and any other relevant information. Finially, be sure to write notes for the next chapter to help other translators."
 
-def get_chapter_translation_prompt(chapter_number, novel_id, model=Models['GEMMA3']):
+def get_chapter_translation_prompt(chapter_number, novel_id):
     # Fetch the chapter content from the database
     try:
         chapter = db.Chapter.get((db.Chapter.chapter_number == chapter_number) & (db.Chapter.novel == novel_id))
