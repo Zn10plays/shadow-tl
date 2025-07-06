@@ -61,7 +61,7 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperatu
     try:
         completion = openai_client.chat.completions.create(
             model=openai_client.default_model,
-            max_tokens=10_000,
+            max_tokens=15_000,
             messages=prompt,
             temperature=temperature,
             response_format={
