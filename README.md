@@ -22,9 +22,9 @@ pip install -r requirements.txt
 
 ### Environ
 the following environment variables must be set prior to any use
-- **VLLM_BACKEND_URL**: http://localhost:8000/v1 # note final /v1
-- **VLLM_KEY**: api key to access the vllm server, default null
-- **VLLM_DEFAULT_MODEL**: default model, for testing google/gemma-3-1b-it
+- **OPEAN_AI_SERVER_URL**: http://localhost:8000/v1 # note final /v1
+- **API_KEY**: api key to access the vllm server, default null
+- **DEFAULT_MODEL**: default model, for testing google/gemma-3-1b-it
 
 ## Usage
 This can be considered a template project. All work happens in the **main** file.

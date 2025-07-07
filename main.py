@@ -4,7 +4,7 @@ from vllm.connector import translate_chapter
 from utils.refrences import save_translated_chapter
 
 def main():
-    chapter = Chapter.get(novel_id=1, chapter_number=1)
+    chapter = Chapter.get(novel_id=1, chapter_number=3)
 
     results, success = translate_chapter(
         chapter,

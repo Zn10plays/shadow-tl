@@ -17,9 +17,9 @@ def get_openai_client():
     """
     Initialize and return an OpenAI client with the specified base URL and API key.
     """
-    base_url = os.getenv("VLLM_BACKEND_URL", "http://localhost:8000/v1")
-    api_key = os.getenv("VLLM_KEY", "your_api_key_here")  # Replace with your actual API key
-    base_model = os.getenv("VLLM_DEFAULT_MODEL", "google/gemma-3-1b-it")
+    base_url = os.getenv("OPEAN_AI_SERVER_URL", "http://localhost:8000/v1")
+    api_key = os.getenv("API_KEY", "your_api_key_here")  # Replace with your actual API key
+    base_model = os.getenv("DEFAULT_MODEL", "google/gemma-3-1b-it")
 
     client = openai.OpenAI(
         base_url=base_url,
