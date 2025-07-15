@@ -25,15 +25,26 @@ def summarize_bible_changes(old_bible: BibleInfo, new_bible: BibleInfo) -> tuple
         print(ValueError("Unable to summarize the bible changes. Exception"+ str(e)))
         return "Unable to summarize the bible changes.", False
 
-def add_or_update_bible_info(novel: Novel, info: BibleInfo):
+def add_or_update_bible_info(novel: Novel, info: BibleInfo, force=False):
     """
     logically add or update the bible info for a novel
     """
 
+    info.name = info.name.strip()
+    info.description = info.description.strip() if info.description else ""
+    info.classification = info.classification.strip() if info.classification else ""
+    info.raw_name = info.raw_name.strip()
+
+    if not force:
+        # if the og name is english, dont add a record
+        english_characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789 -_'
+        if all(c in english_characters for c in info.raw_name):
+            return
+
     # Check if the info already exists
     existing_info: BibleInfo = BibleInfo.get_or_none(
         (BibleInfo.novel == novel) & 
-        (BibleInfo.raw_name == info.raw_name)
+        (BibleInfo.name == info.name)
     )
 
     # if new or classification is different, we need to update it

@@ -45,8 +45,9 @@ def get_relevent_terms(chapterid: int, verbose: bool = False) -> list[BibleInfo]
 system_prompt = "You are an translation agent at a webnovel publishing company. You are tasked with translating chapters of web novels from Koren to English." \
     " When you translate chapter, be ware of what the names, places, and other proper nouns in the chapter. Also be mindful of the tone, setting, spacing of lines, and flow of the chapter." \
     " before you translate, summarize the chapter, once you are completed, write a character bible in order to mantain consistency in the translation. The character bible" \
-    " should include the names and places (original, and translated), and other proper nouns in the chapter, as well as their classification (person, place, item, skill) descriptions" \
-    " and any other relevant information. Finially, be sure to write notes for the next chapter to help other translators."
+    " should include the names and places (original, and translated; orignal should be in korean, transalted should be in english), and other proper nouns in the chapter, as well as their classification (person, place, item, skill) descriptions" \
+    " and any other relevant information. The discription should be brief and chapter agnostic (previous translators have struggled with this so be carefule, update the bible as needed)." \
+    " Finially, be sure to write notes for the next chapter to help other translators."
 
 def get_chapter_translation_prompt(chapter_number, novel_id):
     # Fetch the chapter content from the database
@@ -59,7 +60,6 @@ def get_chapter_translation_prompt(chapter_number, novel_id):
     
     # look for previous chapter
     if (chapter_number > 1):
-        print('chapter number is greater than 1')
         previous_chapter = db.Chapter.get_or_none((db.Chapter.chapter_number == chapter_number - 1) & (db.Chapter.novel == novel_id))
     else:
         previous_chapter = None 

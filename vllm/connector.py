@@ -1,7 +1,10 @@
+from datetime import datetime
 import openai
 import os
 from shadow_db import Chapter  # Adjusted import to match the new structure
+from utils.json import force_validate_TranslationResults
 from vllm.models import TranslatedResults
+from shadow_db import Logs
 from utils.prompts import get_chapter_translation_prompt
 import dotenv
 dotenv.load_dotenv()
@@ -22,8 +25,8 @@ def get_openai_client():
     base_model = os.getenv("DEFAULT_MODEL", "google/gemma-3-1b-it")
 
     client = openai.OpenAI(
-        base_url=base_url,
-        api_key=api_key,
+        api_key='AIzaSyCuaggHW8rua4QrJrcVFO-AsM6zPuMu9Yg',
+        base_url='https://generativelanguage.googleapis.com/v1beta/openai/',
     )
 
     # Set the default model if not specified
@@ -32,7 +35,7 @@ def get_openai_client():
     
     return client
 
-def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperature=None, thinking_budget=0, include_thoughts=False) -> tuple[TranslatedResults, bool]:
+def translate_chapter(chapter: Chapter, local_processing=True, log_stream=False, force=False, temperature=None, thinking_budget=0, include_thoughts=False) -> tuple[TranslatedResults, bool]:
     """
     Translate a chapter using the OpenAI client.
     returns translation results, and a boolean indicating success.
@@ -58,58 +61,71 @@ def translate_chapter(chapter: Chapter, log_stream=False, force=False, temperatu
 
     prompt = get_chapter_translation_prompt(chapter.chapter_number, chapter.novel)
 
-    try:
-        completion = openai_client.chat.completions.create(
-            model=openai_client.default_model,
-            max_tokens=15_000,
-            messages=prompt,
-            temperature=temperature,
-            response_format={
-                'type': 'json_schema',
-                "json_schema": {
-                    'name': 'TranslatedResults',
-                    "schema": TranslatedResults.model_json_schema(),
-                }
-            },
-            extra_body={
-                'extra_body': {
-                    "google": {
-                        "thinking_config": {
-                            "thinking_budget": thinking_budget,
-                            "include_thoughts": include_thoughts
-                        }
+    completion = openai_client.chat.completions.create(
+        model=openai_client.default_model,
+        max_tokens=15_000,
+        messages=prompt,
+        temperature=temperature,
+        response_format={
+            'type': 'json_schema',
+            "json_schema": {
+                'name': 'TranslatedResults',
+                "schema": TranslatedResults.model_json_schema(),
+            }
+        },
+        extra_body={
+            'extra_body': {
+                "google": {
+                    "thinking_config": {
+                        "thinking_budget": thinking_budget,
+                        "include_thoughts": include_thoughts
                     }
                 }
-            },
-            stream=log_stream
-        )
+            }
+        },
+        stream=local_processing
+    )
 
-        if log_stream:
-            content = ''
+    if local_processing:
+        content = ''
 
+        try:
             for chunk in completion:
                 if hasattr(chunk, 'choices') and chunk.choices:
-                    print(chunk.choices[0].delta.content, end='', flush=True)
-                    content += chunk.choices[0].delta.content
+                    if log_stream:
+                        print(chunk.choices[0].delta.content, end='', flush=True)
+                    content += str(chunk.choices[0].delta.content) if chunk.choices[0].delta.content else ''
 
-            print()  # Ensure a newline after the stream
+            if log_stream:
+                print()  # Ensure a newline after the stream
 
-            # json parse the content
-            if content.startswith('{') and content.endswith('}'):
-                print (f"Translated content for chapter {chapter.chapter_number} of novel {chapter.novel}: {content}")
-                return TranslatedResults.model_validate_json(content), True
-            else:
-                raise ValueError("Streamed content is not a valid JSON object.")
+        except Exception as e:
+            print(f"Error occurred while processing chunks: {e}")
 
-        return TranslatedResults.model_validate_json(completion.choices[0].message.content), True
-    
-    except Exception as e:
+    else:
+        content = completion.choices[0].message.content
 
-        print(f"Error translating chapter {chapter.chapter_number} of novel {chapter.novel_id}: {e}")
+    parsed_results, success = force_validate_TranslationResults(content)
+
+    if not success:
+        logs = Logs(
+            service='translation and parsing',
+            message=f"Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}. Content: {content}",
+            message_type='error',
+            time=datetime.now(),
+            instance_id=os.getenv('INSTANCE_ID', 'unknown')
+        )
+
+        logs.save()
+
+        print(f"[ERROR] Traceback Log id {logs}: Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}.")
+
         return TranslatedResults(
-            translated_title='ERROR!!- Unable to translate chapter',
-            summary='ERROR!!- Unable to summarize chapter',
+            translated_title='!!ERROR ERROR!!',
+            summary=f'[ERROR] Traceback Log id {logs}: Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}. ',
             character_bible=[],
-            notes_for_next_chapter='ERROR!!- Unable to provide notes for next chapter',
-            translated_content='ERROR!!- Unable to translate chapter content'
+            notes_for_next_chapter='',
+            translated_content=''
         ), False
+    
+    return parsed_results, True
