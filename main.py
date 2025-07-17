@@ -28,8 +28,6 @@ def main():
             return
 
         save_translated_chapter(chapter, results)
-
-        break
     
 
 if __name__ == "__main__":
