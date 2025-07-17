@@ -158,32 +158,46 @@ def translate_chapter_Google(chapter: Chapter, local_processing=True, log_stream
     response = client.models.generate_content(
         model=client.default_model,
         contents=prompt[1]['content'],
-        system_instruction=prompt[0]['content'],
-        config={
-            "response_mime_type": "application/json",
-            "response_schema": TranslatedResults,
-            "max_output_tokens": 15_000,
-        },
-        temperature=temperature,
-        thinking_config={
-            "thinking_budget": thinking_budget,
-            "include_thoughts": include_thoughts
-        },
-        safety_settings=safety_settings,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_schema=TranslatedResults,
+            max_output_tokens=15_000,
+            temperature=temperature if temperature is not None else 0.2,
+            thinking_config=types.ThinkingConfig(
+                thinking_budget=thinking_budget,
+                include_thoughts=include_thoughts
+            ),
+            system_instruction=prompt[0]['content'],
+            safety_settings=safety_settings,
+        )
     )
 
     try:
         content = response.text
 
         if local_processing:
-            results = force_validate_TranslationResults(content)
+            results, success = force_validate_TranslationResults(content)
+
+            if not success:
+                print(f"[ERROR] Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}. Content: {content}")
+                return TranslatedResults(
+                    translated_title='!!ERROR ERROR!!',
+                    summary=f'[ERROR] Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}. Content: {content}',
+                    character_bible=[],
+                    notes_for_next_chapter='',
+                    translated_content=''
+                ), False
+            
+            return results, True
+
+
 
     except Exception as e:
         print(f"Error occurred while processing chunks: {e}")
 
         logs = Logs(
             service='translation and parsing',
-            message=f"Error occurred while processing chunks: {e}",
+            message=f"Error occurred while processing chunks: {e} \n \n content: {content}",
             message_type='error',
             time=datetime.now(),
             instance_id=os.getenv('INSTANCE_ID', 'unknown')
@@ -192,7 +206,7 @@ def translate_chapter_Google(chapter: Chapter, local_processing=True, log_stream
 
         return TranslatedResults(
             translated_title='!!ERROR ERROR!!',
-            summary=f'[ERROR] Traceback Log id {logs}: Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}. Content: {content.text}',
+            summary=f'[ERROR] Traceback Log id {logs}: Failed to parse the translation results for chapter {chapter.chapter_number} of novel {chapter.novel}',
             character_bible=[],
             notes_for_next_chapter='',
             translated_content=''
@@ -230,7 +244,6 @@ def translate_chapter(chapter: Chapter, local_processing=True, log_stream=False,
             chapter,
             local_processing=local_processing,
             log_stream=log_stream,
-            force=force,
             temperature=temperature,
             thinking_budget=thinking_budget,
             include_thoughts=include_thoughts
